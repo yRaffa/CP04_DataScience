@@ -6,6 +6,9 @@ import numpy as np
 
 st.set_page_config(page_title='Portfólio Profissional', page_icon='🎮', layout='wide')
 
+st.sidebar.title("Navegação")
+st.sidebar.markdown("Selecione a página no menu acima ☝️")
+
 st.title('🎮 Portfólio Profissional - Rafael Oliveira')
 st.subheader('Apresentação Profissional e Análise de Dados')
 
