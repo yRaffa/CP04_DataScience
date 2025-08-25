@@ -451,8 +451,8 @@ match analises:
         tendencia_lancamentos(df_f)
         st.markdown('''
         - O auge dos lançamentos foi entre 2005 e 2015, chegando a um pico de 1427 jogos em 2008.
-        - Após 2016 houve uma queda brusca nos registros, com pouquíssimos lançamentos em 2017 e 2020 
-        (provavelmente falha de preenchimento ou fim do dataset).
+        - Após 2016 houve uma queda brusca nos registros, com pouquíssimos lançamentos em 2017 e 2020.
+        Provavelmente isso se deve ao jogos estarem ficando cada vez mais caros e demorados de produzir.
         \n
         💡 **Insight:** O período de ouro do mercado foi a década de 2000, marcado pela expansão do PS2, Wii e DS.
         ''')
