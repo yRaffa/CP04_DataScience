@@ -222,23 +222,23 @@ analises = st.sidebar.radio(
 )
 
 def mostrar_dicionario_variaveis():
-    data = [("Name", "Qualitativa", "Nominal", "Nome do jogo → identificação, não possui ordem."),
-            ("Platform", "Qualitativa", "Nominal", "Plataforma (PS4, Xbox, etc.), categorias sem hierarquia."),
-            ("Year_of_Release", "Quantitativa", "Discreta", "Anos inteiros (1980, 2005...), não fracionados."),
-            ("Genre", "Qualitativa", "Nominal", "Categoria de jogo (Action, Sports, RPG...), sem hierarquia."),
-            ("Publisher", "Qualitativa", "Nominal", "Nome da empresa (Nintendo, EA, etc.), apenas rótulos."),
-            ("Developer", "Qualitativa", "Nominal", "Nome do estúdio desenvolvedor, apenas rótulos."),
-            ("Rating", "Qualitativa", "Ordinal", "Classificação etária (E, T, M, AO...), ordem implícita."),
-            ("NA_Sales", "Quantitativa", "Contínua", "Vendas em milhões (pode ser 1.52, 0.03, etc.)."),
-            ("EU_Sales", "Quantitativa", "Contínua", "Vendas na Europa, fracionadas."),
-            ("JP_Sales", "Quantitativa", "Contínua", "Vendas no Japão, fracionadas."),
-            ("Other_Sales", "Quantitativa", "Contínua", "Vendas em outras regiões, fracionadas."),
-            ("Global_Sales", "Quantitativa", "Contínua", "Soma das vendas, fracionadas."),
-            ("Critic_Score", "Quantitativa", "Contínua", "Nota média (0–100), pode ter decimais."),
-            ("Critic_Count", "Quantitativa", "Discreta", "Número de críticos (contagem inteira)."),
-            ("User_Score", "Quantitativa", "Contínua", "Nota média (0–10), pode ter decimais."),
-            ("User_Count", "Quantitativa", "Discreta", "Número de usuários (contagem inteira).")]
-    df_dict = pd.DataFrame(data, columns=["Coluna", "Tipo", "Subtipo", "Justificativa"])
+    data = [('Name', 'Qualitativa', 'Nominal', 'Nome do Jogo → Identificação sem Hierarquia'),
+            ('Platform', 'Qualitativa', 'Nominal', 'Plataforma → Categorias sem Hierarquia'),
+            ('Year_of_Release', 'Quantitativa', 'Discreta', 'Ano de Lançamento → Números Inteiros'),
+            ('Genre', 'Qualitativa', 'Nominal', 'Gênero do Jogo → Categorias sem Hierarquia'),
+            ('Publisher', 'Qualitativa', 'Nominal', 'Nome da Empresa Publicadora → Identificação sem Hierarquia'),
+            ('Developer', 'Qualitativa', 'Nominal', 'Nome do Estúdio Desenvolvedor → Identificação sem Hierarquia'),
+            ('Rating', 'Qualitativa', 'Ordinal', 'Classificação Etária (ESRB) → Classificação com Ordem Implícita'),
+            ('NA_Sales', 'Quantitativa', 'Contínua', 'Vendas na América do Norte (Milhões) → Números Reais, pode ter Decimais'),
+            ('EU_Sales', 'Quantitativa', 'Contínua', 'Vendas na Europa (Milhões) → Números Reais, pode ter Decimais'),
+            ('JP_Sales', 'Quantitativa', 'Contínua', 'Vendas no Japão (Milhões) → Números Reais, pode ter Decimais'),
+            ('Other_Sales', 'Quantitativa', 'Contínua', 'Vendas em Outras Regiões (Milhões) → Números Reais, pode ter Decimais'),
+            ('Global_Sales', 'Quantitativa', 'Contínua', 'Soma das Vendas Globais (Milhões) → Números Reais, pode ter Decimais'),
+            ('Critic_Score', 'Quantitativa', 'Contínua', 'Nota Média de Críticos (0–100) → Números Reais, pode ter Decimais'),
+            ('Critic_Count', 'Quantitativa', 'Discreta', 'Número de Críticos → Números Inteiros'),
+            ('User_Score', 'Quantitativa', 'Contínua', 'Nota Média de Usuários (0–10), → Números Reais, pode ter Decimais'),
+            ('User_Count', 'Quantitativa', 'Discreta', 'Número de Usuários → Números Inteiros')]
+    df_dict = pd.DataFrame(data, columns=['Coluna', 'Tipo', 'Subtipo', 'Descrição'])
     st.dataframe(df_dict, use_container_width=True)
 
 # Switch-case para exibir a análise escolhida
@@ -249,32 +249,7 @@ match analises:
         with st.expander('Visualizar amostra da base', expanded=False):
             st.dataframe(df_f.head(25), use_container_width=True)
         st.divider()
-        st.subheader('📋 Descrição das Colunas')
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown('''
-            - **Name**: Nome do jogo
-            - **Platform**: Plataforma (ex: PS4, XOne, PC)
-            - **Year_of_Release**: Ano de lançamento
-            - **Genre**: Gênero do jogo (ex: Action, Sports)
-            - **Publisher**: Empresa publicadora
-            - **Developer**: Empresa desenvolvedora
-            - **Other_Sales**: Vendas em outras regiões (milhões)
-            - **Global_Sales**: Vendas globais (milhões)
-            ''')
-        with col2:
-            st.markdown('''
-            - **NA_Sales**: Vendas na América do Norte (milhões)
-            - **EU_Sales**: Vendas na Europa (milhões)
-            - **JP_Sales**: Vendas no Japão (milhões)
-            - **Critic_Score**: Nota média dos críticos (0-100)
-            - **Critic_Count**: Número de críticas recebidas
-            - **User_Score**: Nota média dos usuários (0-10)
-            - **User_Count**: Número de avaliações dos usuários
-            - **Rating**: Classificação etária (ESRB) (ex: E, T, M)
-            ''')
-        st.divider()
-        st.subheader('📈 Identificação do tipo das variáveis')
+        st.subheader('📋 Identificação dos Tipos das Variáveis & Descrição das Colunas')
         mostrar_dicionario_variaveis()
         st.divider()
         st.subheader('❔ Principais Perguntas da Análise de Dados')
@@ -345,4 +320,4 @@ match analises:
         vendas_classificacao_etaria(df_f)
 
     case _:
-        st.warning("Selecione uma análise válida na barra lateral.")
+        st.warning('Selecione uma análise válida na barra lateral.')
