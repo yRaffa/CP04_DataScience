@@ -29,13 +29,10 @@ def load_data():
 df = load_data()
 st.title('📊 Análise de Dados de Games')
 st.divider()
-st.subheader('Exploração e Visualização de Dados de Jogos')
-st.write('Base de dados: Vendas e Avaliações de Jogos *(1980-2020)* - *(Fonte: Kaggle)* ')
-st.divider()
 st.caption('Escolha a Análise na Barra Lateral.')
 st.caption('Use os Filtros Abaixo')
 
-with st.expander('⚙️ Filtros', expanded=True):
+with st.expander('⚙️ Filtros', expanded=False):
     if df['Year_of_Release'].dropna().empty:
         ano_inicial, ano_final = 1980, 2025
     else:
@@ -51,7 +48,7 @@ with st.expander('⚙️ Filtros', expanded=True):
     sel_generos = st.multiselect('Gêneros',    generos,    default=generos)
     sel_publishers = st.multiselect('Publishers (opcional)', publishers, default=[])
 
-# aplica filtros
+# Aplica os Filtros
 mask = (
     df['Year_of_Release'].between(periodo[0], periodo[1], inclusive='both')
 ) & (df['Platform'].isin(sel_plataformas)) & (df['Genre'].isin(sel_generos))
@@ -72,7 +69,7 @@ with col_k4:
 
 st.divider()
 
-# Análise: tendência de lançamentos por anoS
+# Análise: tendência de lançamentos por ano
 def tendencia_lancamentos(data: pd.DataFrame):
     s = data.dropna(subset=['Year_of_Release']).groupby('Year_of_Release')['Name'].count().reset_index()
     if s.empty:
@@ -164,7 +161,7 @@ def correlacao_notas(data: pd.DataFrame):
         return
     d = d.assign(Critic_Score_10 = d['Critic_Score'] / 10.0)
 
-    # tenta com trendline OLS (precisa de statsmodels). Se não estiver instalado, cai no plano B.
+    # tenta trendline OLS (statsmodels); se não houver, mostra sem tendência
     try:
         fig = px.scatter(
             d, x='Critic_Score_10', y='User_Score',
@@ -203,6 +200,12 @@ def vendas_classificacao_etaria(data: pd.DataFrame):
     fig.update_layout(template='plotly_dark')
     st.plotly_chart(fig, use_container_width=True)
 
+#Visao geral dos dados
+def visao_geral():
+    st.subheader('📌 Visão Geral dos Dados')
+    with st.expander('Visualizar amostra da base', expanded=False):
+        st.dataframe(df_f.head(25), use_container_width=True)
+
 analises = st.sidebar.radio(
     'Escolha a análise',
     [
@@ -218,20 +221,128 @@ analises = st.sidebar.radio(
     index=0
 )
 
-def visao_geral():
-    st.subheader('📌 Visão Geral dos Dados')
-    with st.expander('Visualizar amostra da base', expanded=False):
-        st.dataframe(df_f.head(25), use_container_width=True)
+def mostrar_dicionario_variaveis():
+    data = [("Name", "Qualitativa", "Nominal", "Nome do jogo → identificação, não possui ordem."),
+            ("Platform", "Qualitativa", "Nominal", "Plataforma (PS4, Xbox, etc.), categorias sem hierarquia."),
+            ("Year_of_Release", "Quantitativa", "Discreta", "Anos inteiros (1980, 2005...), não fracionados."),
+            ("Genre", "Qualitativa", "Nominal", "Categoria de jogo (Action, Sports, RPG...), sem hierarquia."),
+            ("Publisher", "Qualitativa", "Nominal", "Nome da empresa (Nintendo, EA, etc.), apenas rótulos."),
+            ("Developer", "Qualitativa", "Nominal", "Nome do estúdio desenvolvedor, apenas rótulos."),
+            ("Rating", "Qualitativa", "Ordinal", "Classificação etária (E, T, M, AO...), ordem implícita."),
+            ("NA_Sales", "Quantitativa", "Contínua", "Vendas em milhões (pode ser 1.52, 0.03, etc.)."),
+            ("EU_Sales", "Quantitativa", "Contínua", "Vendas na Europa, fracionadas."),
+            ("JP_Sales", "Quantitativa", "Contínua", "Vendas no Japão, fracionadas."),
+            ("Other_Sales", "Quantitativa", "Contínua", "Vendas em outras regiões, fracionadas."),
+            ("Global_Sales", "Quantitativa", "Contínua", "Soma das vendas, fracionadas."),
+            ("Critic_Score", "Quantitativa", "Contínua", "Nota média (0–100), pode ter decimais."),
+            ("Critic_Count", "Quantitativa", "Discreta", "Número de críticos (contagem inteira)."),
+            ("User_Score", "Quantitativa", "Contínua", "Nota média (0–10), pode ter decimais."),
+            ("User_Count", "Quantitativa", "Discreta", "Número de usuários (contagem inteira).")]
+    df_dict = pd.DataFrame(data, columns=["Coluna", "Tipo", "Subtipo", "Justificativa"])
+    st.dataframe(df_dict, use_container_width=True)
 
-opcoes_analise = {
-    'Visão Geral': visao_geral,
-    'Tendência de Lançamentos por Ano': lambda: tendencia_lancamentos(df_f),
-    'Gêneros Mais Populares': lambda: generos_populares(df_f),
-    'Plataformas com Mais Lançamentos': lambda: lancamentos_plataformas(df_f),
-    'Top 10 Jogos por Vendas Globais': lambda: vendas_globais(df_f),
-    'Vendas por Região': lambda: vendas_regiao(df_f),
-    'Notas: Críticos vs Usuários': lambda: correlacao_notas(df_f),
-    'Vendas por Classificação Etária (Rating)': lambda: vendas_classificacao_etaria(df_f),
-}
+# Switch-case para exibir a análise escolhida
+match analises:
+    case 'Visão Geral':
+        st.subheader('📌 Visão Geral dos Dados')
+        st.write('Base de dados: Vendas e Análises de Jogos *(1980 - 2020)*')
+        with st.expander('Visualizar amostra da base', expanded=False):
+            st.dataframe(df_f.head(25), use_container_width=True)
+        st.divider()
+        st.subheader('📋 Descrição das Colunas')
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown('''
+            - **Name**: Nome do jogo
+            - **Platform**: Plataforma (ex: PS4, XOne, PC)
+            - **Year_of_Release**: Ano de lançamento
+            - **Genre**: Gênero do jogo (ex: Action, Sports)
+            - **Publisher**: Empresa publicadora
+            - **Developer**: Empresa desenvolvedora
+            - **Other_Sales**: Vendas em outras regiões (milhões)
+            - **Global_Sales**: Vendas globais (milhões)
+            ''')
+        with col2:
+            st.markdown('''
+            - **NA_Sales**: Vendas na América do Norte (milhões)
+            - **EU_Sales**: Vendas na Europa (milhões)
+            - **JP_Sales**: Vendas no Japão (milhões)
+            - **Critic_Score**: Nota média dos críticos (0-100)
+            - **Critic_Count**: Número de críticas recebidas
+            - **User_Score**: Nota média dos usuários (0-10)
+            - **User_Count**: Número de avaliações dos usuários
+            - **Rating**: Classificação etária (ESRB) (ex: E, T, M)
+            ''')
+        st.divider()
+        st.subheader('📈 Identificação do tipo das variáveis')
+        mostrar_dicionario_variaveis()
+        st.divider()
+        st.subheader('❔ Principais Perguntas da Análise de Dados')
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown('''
+            >**1. Tendência de Lançamentos por Ano**
+            - Quais anos tiveram picos ou quedas significativas?
+            - Existe uma tendência de crescimento ou declínio no número de lançamentos?
+            \n
+            >**2. Gêneros Mais Populares**
+            - Quais são os gêneros mais populares em termos de lançamentos?
+            - Quais gêneros geram mais vendas globais?
+            \n
+            >**3. Plataformas com Mais Lançamentos**
+            - Quais plataformas têm o maior número de lançamentos?
+            - Existe uma correlação entre o número de lançamentos e as vendas globais por plataforma?
+            \n
+            >**4. Vendas por Região**
+            - Quais regiões apresentam as maiores vendas de jogos?
+            - Existem diferenças significativas nas preferências de jogos entre regiões?
+            ''')
+        with col2:
+            st.markdown('''
+            >**5. Notas: Críticos vs Usuários**
+            - Quais jogos apresentam maior discrepância entre as avaliações de críticos e usuários?
+            - As notas influenciam as vendas globais dos jogos?
+            \n
+            >**6. Vendas por Classificação Etária**
+            - Quais classificações etárias (ESRB) geram mais vendas?
+            - Como a distribuição de vendas por classificação etária mudou ao longo do tempo?
+            \n
+            >**7. Publicadoras e Desenvolvedoras**
+            - Quais publicadoras e desenvolvedoras lançaram mais jogos?
+            - Quais publicadoras têm os jogos mais bem avaliados?
+            \n
+            >**8. Jogos de Maior Sucesso**
+            - Quais jogos tiveram as maiores vendas globais?
+            - Quais são os jogos mais populares por gênero?
+            ''')
 
-opcoes_analise[analises]()
+    case 'Tendência de Lançamentos por Ano':
+        st.subheader('📈 Tendência de Lançamentos por Ano')
+        tendencia_lancamentos(df_f)
+
+    case 'Gêneros Mais Populares':
+        st.subheader('🎭 Gêneros Mais Populares')
+        generos_populares(df_f)
+
+    case 'Plataformas com Mais Lançamentos':
+        st.subheader('💻 Plataformas com Mais Lançamentos')
+        lancamentos_plataformas(df_f)
+
+    case 'Top 10 Jogos por Vendas Globais':
+        st.subheader('🏆 Top 10 Jogos por Vendas Globais')
+        vendas_globais(df_f)
+
+    case 'Vendas por Região':
+        st.subheader('🌍 Vendas por Região')
+        vendas_regiao(df_f)
+
+    case 'Notas: Críticos vs Usuários':
+        st.subheader('⭐ Correlação de Notas: Críticos vs Usuários')
+        correlacao_notas(df_f)
+
+    case 'Vendas por Classificação Etária (Rating)':
+        st.subheader('🔞 Vendas por Classificação Etária')
+        vendas_classificacao_etaria(df_f)
+
+    case _:
+        st.warning("Selecione uma análise válida na barra lateral.")
